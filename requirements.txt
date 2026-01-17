@@ -1,0 +1,30 @@
+# minimal-phoneme-tts 依存パッケージ
+# Python 3.12.9, PyTorch 2.5.1+cu121 が既にインストール済みの環境で使用
+
+# TTS基盤（ESPnet2またはStyleTTS2）
+# ESPnet2を優先、失敗時はStyleTTS2に切り替え
+espnet[all]>=2024.10
+# styletts2>=2.0.0  # 代替案（ESPnet2失敗時）
+
+# 音素解析
+pyopenjtalk>=0.3.0
+
+# 音声処理
+librosa>=0.10.0
+soundfile>=0.12.0
+
+# 可視化
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# 評価（ASR）
+openai-whisper>=20231117
+
+# データ処理・数値計算
+# numpy>=1.24.0  # PyTorchと共に既にインストール済み
+scipy>=1.10.0
+pandas>=2.0.0
+
+# その他ユーティリティ
+tqdm>=4.66.0
+pyyaml>=6.0
