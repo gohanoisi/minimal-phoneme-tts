@@ -1,0 +1,82 @@
+# Fine-tuning configuration for Tacotron2
+# Based on JVS recipe: espnet/egs2/jvs/tts1/conf/tuning/finetune_tacotron2.yaml
+# Adjusted for small corpus fine-tuning (4-80 sentences)
+
+##########################################################
+#                  TTS MODEL SETTING                     #
+##########################################################
+tts: tacotron2                   # model architecture
+tts_conf:                        # keyword arguments for the selected model
+    embed_dim: 512               # char or phn embedding dimension
+    elayers: 1                   # number of blstm layers in encoder
+    eunits: 512                  # number of blstm units
+    econv_layers: 3              # number of convolutional layers in encoder
+    econv_chans: 512             # number of channels in convolutional layer
+    econv_filts: 5               # filter size of convolutional layer
+    atype: location              # attention function type
+    adim: 512                    # attention dimension
+    aconv_chans: 32              # number of channels in convolutional layer of attention
+    aconv_filts: 15              # filter size of convolutional layer of attention
+    cumulate_att_w: true         # whether to cumulate attention weight
+    dlayers: 2                   # number of lstm layers in decoder
+    dunits: 1024                 # number of lstm units in decoder
+    prenet_layers: 2             # number of layers in prenet
+    prenet_units: 256            # number of units in prenet
+    postnet_layers: 5            # number of layers in postnet
+    postnet_chans: 512           # number of channels in postnet
+    postnet_filts: 5             # filter size of postnet layer
+    output_activation: null      # activation function for the final output
+    use_batch_norm: true         # whether to use batch normalization in encoder
+    use_concate: true            # whether to concatenate encoder embedding with decoder outputs
+    use_residual: false          # whether to use residual connection in encoder
+    dropout_rate: 0.5            # dropout rate
+    zoneout_rate: 0.1            # zoneout rate
+    reduction_factor: 1          # reduction factor
+    spk_embed_dim: null          # speaker embedding dimension
+    use_masking: true            # whether to apply masking for padded part in loss calculation
+    bce_pos_weight: 5.0          # weight of positive sample in binary cross entropy calculation
+    use_guided_attn_loss: true   # whether to use guided attention loss
+    guided_attn_loss_sigma: 0.4  # sigma of guided attention loss
+    guided_attn_loss_lambda: 1.0 # strength of guided attention loss
+
+##########################################################
+#                  OPTIMIZER SETTING                     #
+##########################################################
+optim: adam           # optimizer type
+optim_conf:           # keyword arguments for selected optimizer
+    lr: 1.0e-04       # learning rate (smaller for fine-tuning)
+    eps: 1.0e-06      # epsilon
+    weight_decay: 0.0 # weight decay coefficient
+
+##########################################################
+#                OTHER TRAINING SETTING                  #
+##########################################################
+# Note: num_iters_per_epoch and max_epoch control training duration
+# For fine-tuning with small corpus:
+#   - 80 sentences: ~5000-10000 steps (adjust based on iterations)
+#   - 4-10 sentences: ~1000-3000 steps (adjust based on iterations)
+num_iters_per_epoch: 100    # number of iters per epoch
+max_epoch: 100              # number of epochs (will be limited by max_num_iter)
+grad_clip: 1.0              # gradient clipping norm
+grad_noise: false           # whether to use gradient noise injection
+accum_grad: 1               # gradient accumulation
+# batch_bins: 1000000       # batch bins (for feats_type=fbank)
+batch_bins: 3750000         # batch bins (for feats_type=raw, *= n_shift / n_mels)
+# For small corpus (4-10 sentences), reduce batch_bins to avoid OOM
+# batch_bins: 1000000       # uncomment for 4-10 sentence corpus
+batch_type: numel           # how to make batch
+sort_in_batch: descending   # how to sort data in making batch
+sort_batch: descending      # how to sort created batches
+num_workers: 1              # number of workers of data loader
+train_dtype: float32        # dtype in training
+log_interval: null          # log interval in iterations
+keep_nbest_models: 5        # number of models to keep
+num_att_plot: 3             # number of attention figures to be saved in every check
+seed: 42                    # random seed number (fixed for reproducibility)
+best_model_criterion:
+-   - valid
+    - loss
+    - min
+-   - train
+    - loss
+    - min

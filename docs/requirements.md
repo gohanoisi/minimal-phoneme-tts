@@ -20,7 +20,7 @@
 事前学習済み日本語TTSモデルを利用し、以下4条件のコーパスでfine-tuning→合成→客観評価まで到達すること:
 1. 80文コーパス（学習用）
 2. 37音素を全カバーする4文コーパス
-3. ランダムに選んだ4文コーパス
+3. 低カバレッジ4文コーパス（目標20-25音素、約50-65%カバー、対照群）
 4. 音素特徴量上位10文コーパス
 
 ---
@@ -33,7 +33,7 @@
 | 機能ID | 機能名 | 説明 |
 |--------|--------|------|
 | F01 | 音素分析 | 100文コーパスから37音素インベントリと各文の音素分布を抽出・保存 |
-| F02 | コーパス選定 | 4条件（80文/37音素4文/ランダム4文/上位10文）の文IDリスト生成 |
+| F02 | コーパス選定 | 4条件（80文/37音素4文/低カバレッジ4文/上位10文）の文IDリスト生成 |
 | F03 | データ前処理 | JVS parallel100 jvs002話者データの前処理パイプライン |
 | F04 | Fine-tuning | 各条件でのモデル学習実行スクリプト |
 | F05 | 音声合成 | テスト文からの音声生成 |
@@ -73,7 +73,7 @@ Given: JVS parallel100 corpus with 100 sentences containing 37 unique phonemes
 When: I run fine-tuning experiments with 4 different corpus conditions
   - 80 sentences (baseline with maximum data)
   - 4 sentences covering all 37 phonemes (minimum phoneme coverage)
-  - 4 random sentences (control group)
+  - 4 sentences with low phoneme coverage (control group, target 20-25 phonemes, ~50-65%)
   - Top 10 sentences by phoneme features (balanced approach)
 Then: I get objective metrics (MCD, F0 RMSE, CER) comparing quality vs corpus size
 And: I can synthesize audio files demonstrating the quality difference
@@ -276,7 +276,7 @@ And: I can establish guidelines for efficient corpus design in future TTS projec
 | **評価指標の計算エラー** | • 手動で1サンプル計算して検証<br>• ESPnet2公式評価スクリプトと比較 |
 
 #### 期限リスクへの対応
-- **1/18時点で進捗50%未満の場合**: 条件を4→3に削減（ランダム4文を除外）
+- **1/18時点で進捗50%未満の場合**: 条件を4→3に削減（E3（低カバレッジ4文）を除外）
 - **1/20時点で評価未完了の場合**: MCD/F0のみに絞る（CERは削除）
 - **1/21時点で分析未完了の場合**: 基本統計のみ、図表は最小限に
 

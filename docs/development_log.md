@@ -345,6 +345,137 @@ Phase 3が完了したため、Phase 4に進む準備が整いました:
 
 ---
 
+## 2026年1月18日（セッション5）
+
+### 作業概要
+E3コーパス選定方法の変更と、Phase 3完了確認、Phase 4実装の開始。
+
+### 実施した作業
+
+#### 1. E3コーパス選定方法の変更
+- **問題**: ランダム4文が34/38音素（約89%）をカバーしており、対照実験として不適切
+- **解決策**: ユニーク音素数が少ない文を優先的に選定する方法に変更
+- **変更内容**:
+  - `src/corpus_selection.py`の`select_random_4_sentences()`関数を変更
+  - ユニーク音素数が少ない順にソートし、目標カバレッジ25音素以下で選定
+  - コーパス選定スクリプトを再実行
+- **結果**: E3の音素カバレッジが**25音素（約65.8%）**になり、目標範囲（20-25音素）を達成
+- **ドキュメント更新**:
+  - `docs/pdca_checklist.md`: E3の説明を「低カバレッジ4文」に更新
+  - `docs/design_memo.md`: E3セクションの変更点と期待される結果を更新
+  - `docs/requirements.md`: E3の説明を更新
+
+#### 2. Phase 3完了確認（データ検証）
+- **E3の音素カバレッジ確認**: 25音素（約65.8%）✓
+- **データファイル確認**:
+  - 4条件すべての`data.list`ファイルが生成済み
+  - データ形式（JSONL）が正しいことを確認
+  - `utt_id`, `speaker`, `text`, `phoneme`, `audio`フィールドがすべて含まれている
+
+#### 3. Phase 4 Step 1-2: データ形式変換スクリプトの作成・実行
+- **ファイル作成**: `src/convert_to_espnet2_format.py`
+  - JSONL形式（`data.list`）からESPnet2のKaldi形式への変換
+  - `wav.scp`, `text`, `utt2spk`, `spk2utt`ファイルの生成
+- **実行結果**:
+  - 4条件すべて（E1, E2, E3, E4）とテストセットをESPnet2形式に変換完了
+  - 各データセットで必要なKaldi形式ファイルが正常に生成されたことを確認
+
+#### 4. Phase 4 Step 4: 設定ファイルの作成
+- **ファイル作成**: `configs/finetune_tacotron2.yaml`
+  - JVSレシピの`conf/tuning/finetune_tacotron2.yaml`をベースに作成
+  - 学習ステップ数、バッチサイズなどの調整に対応
+  - 乱数シードを42に固定（再現性のため）
+
+### 決定事項
+
+1. **E3コーパス選定方法**: ランダム選定から低カバレッジ選定に変更し、対照実験として明確な差を出す
+2. **データ形式変換**: ESPnet2のKaldi形式への変換スクリプトを実装し、全データセットを変換完了
+3. **設定ファイル**: JVSレシピベースの設定ファイルを作成し、fine-tuningの準備を整える
+
+### 技術的な選択
+
+1. **E3選定アルゴリズム**: ユニーク音素数が少ない文を優先的に選定し、目標カバレッジ25音素以下を維持
+2. **データ形式変換**: ESPnet2が要求するKaldi形式（wav.scp, text, utt2spk, spk2utt）への変換を自動化
+3. **設定ファイル**: JVSレシピの設定をベースに、fine-tuning用に調整
+
+#### 5. Phase 4 Step 5: train.pyの実装開始
+- **ファイル更新**: `src/train.py`
+  - ESPnet2の`tts_train.py`をsubprocessで呼び出す実装を追加
+  - 各条件（train_80sent, train_4sent_37phonemes, train_4sent_random, train_10sent_top）をループ処理
+  - 各条件で以下の2ステップを実行する設計:
+    - Step 1: 統計情報収集（`--collect_stats true`）
+    - Step 2: Fine-tuning（`--init_param`で事前学習モデルを指定）
+  - 学習時間の記録機能を追加予定（開始・終了時刻、総学習時間をlogs/ディレクトリに保存）
+
+### 次のステップ
+
+Phase 4の実装を継続：
+1. **事前学習モデルのダウンロード**: ESPnet2 model zooから`kan-bayashi/jsut_tacotron2_accent_with_pause`をダウンロード
+2. **train.pyの実装完成**: ESPnet2の`tts_train.py`を呼び出す実装を完成させる（統計情報収集とFine-tuningの2ステップ実行）
+3. **学習時間記録機能の実装**: logs/ディレクトリに学習時間を保存する機能を追加
+4. **Step 3: 小規模テスト**: E2（4文）で先行テストを実行し、データ形式と学習プロセスの確認
+
+---
+
+## 2026年1月19日（セッション6）
+
+### 作業概要
+train.pyの実装完成と事前学習モデルのダウンロード、パス設定の更新を完了。
+
+### 実施した作業
+
+#### 1. train.pyの実装完成
+- **ファイル更新**: `src/train.py`
+  - ESPnet2の`tts_train.py`をsubprocessで呼び出す実装を完成
+  - 各条件（train_80sent, train_4sent_37phonemes, train_4sent_random, train_10sent_top）をループ処理する`train_all_conditions()`関数を実装
+  - 各条件で以下の2ステップを実行する`train_condition()`関数を実装:
+    - Step 1: 統計情報収集（`--collect_stats true`）
+    - Step 2: Fine-tuning（`--init_param`で事前学習モデルを指定）
+  - 学習時間記録機能を実装（開始・終了時刻、総学習時間を`logs/`ディレクトリにJSON形式で保存）
+  - コマンドライン引数で`--all_conditions`オプションを追加（全条件を一度に実行可能）
+
+#### 2. 事前学習モデルのダウンロード
+- **コマンド実行**: `espnet_model_zoo_download --unpack true --cachedir downloads kan-bayashi/jsut_tacotron2_accent_with_pause`
+- **ダウンロード結果**:
+  - モデルファイルパス: `downloads/0afe7c220cac7d9893eea4ff1e4ca64e/exp/tts_train_tacotron2_raw_phn_jaconv_pyopenjtalk_accent_with_pause/train.loss.ave_5best.pth` (103MB)
+  - ダウンロードディレクトリ全体: 207MB
+  - ダウンロード時間: 約2分（ネットワーク速度に依存）
+
+#### 3. train.pyのデフォルトパス更新
+- **パス構造の確認**: 実際のダウンロード後のパス構造が想定と異なることを確認
+  - 想定: `downloads/kan-bayashi_jsut_tacotron2_accent_with_pause/...`
+  - 実際: `downloads/0afe7c220cac7d9893eea4ff1e4ca64e/...` (ハッシュ値ディレクトリ)
+- **対応**: `train.py`のデフォルトパスを実際のパス構造に更新
+  - デフォルトパスを実際のハッシュ値ディレクトリに変更
+  - パスが存在しない場合に動的に検索する機能を追加
+  - `downloads/`ディレクトリ内を検索し、`train.loss.ave_5best.pth`ファイルを自動的に見つける
+
+#### 4. .gitignoreの確認
+- **確認結果**: `downloads/`は既に`.gitignore`で無視されていることを確認
+- **影響**: 事前学習モデルファイル（207MB）がGitにコミットされないことを確認
+- **`data/test/`と`data/train_*/`について**: テキストファイルのみ（`data.list`, `wav.scp`, `text`, `utt2spk`, `spk2utt`）が含まれており、再現性のためGitにコミットしても問題ないことを確認
+
+### 決定事項
+
+1. **事前学習モデルのパス管理**: ESPnet model zooがダウンロード時に生成するハッシュ値ディレクトリに対応するため、動的検索機能を実装
+2. **Git管理方針**: `downloads/`は`.gitignore`で無視し、`data/test/`と`data/train_*/`のテキストファイルは再現性のためコミット対象とする
+
+### 技術的な選択
+
+1. **事前学習モデルのパス検索**: 固定パスと動的検索の両方を実装し、柔軟性を確保
+2. **学習時間記録**: JSON形式でログを保存し、後で分析しやすい形式を採用
+3. **コマンドライン引数**: `--all_conditions`オプションで全条件を一度に実行可能にし、作業効率を向上
+
+### 次のステップ
+
+Phase 4の準備が完了したため、次は小規模テストの実行：
+
+1. **E2（4文）での小規模テスト**: `python src/train.py --condition train_4sent_37phonemes`を実行し、データ形式と学習プロセスの確認
+2. **学習プロセスの動作確認**: 統計情報収集とFine-tuningの2ステップが正常に実行されるか確認
+3. **エラーハンドリングの検証**: 問題が発生した場合の対応方法を確認
+
+---
+
 ## 変更履歴
 
 | Date | Version | Changes |
@@ -353,3 +484,5 @@ Phase 3が完了したため、Phase 4に進む準備が整いました:
 | 2026-01-18 | 1.1 | セッション2のログ追加、ESPnet2インストール完了 |
 | 2026-01-18 | 1.2 | セッション3のログ追加、Phase 2完了（音素分析・コーパス選定） |
 | 2026-01-18 | 1.3 | セッション4のログ追加、Phase 3完了（データ前処理）、Phase 4のPlan作成 |
+| 2026-01-18 | 1.4 | セッション5のログ追加、E3コーパス選定方法変更、Phase 4実装開始（データ形式変換スクリプト作成・実行、設定ファイル作成） |
+| 2026-01-19 | 1.5 | セッション6のログ追加、train.py実装完成、事前学習モデルダウンロード完了、パス設定更新 |

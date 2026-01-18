@@ -114,18 +114,62 @@ def select_37_phoneme_4_sentences(
 
 def select_random_4_sentences(sentence_stats: Dict, seed: int = 123) -> List[str]:
     """
-    ランダム4文を選定（シード固定）
+    ユニーク音素数が少ない4文を選定（低カバレッジの対照群）
+    
+    変更点: ランダム選定ではなく、ユニーク音素数が少ない文を優先
+    目的: 音素カバレッジが低い場合の影響を確認する対照実験
+    目標カバレッジ: 20-25音素（約50-65%）
     
     Args:
         sentence_stats: 文の統計情報
-        seed: 乱数シード
+        seed: 乱数シード（同点の場合の順序ランダム化に使用）
         
     Returns:
         選定された文IDのリスト（4文）
     """
-    all_sentence_ids = list(sentence_stats.keys())
+    # 各文のユニーク音素数でソート
+    sentence_scores = [
+        (sentence_id, len(stats['unique_phonemes']))
+        for sentence_id, stats in sentence_stats.items()
+    ]
+    sentence_scores.sort(key=lambda x: x[1])  # 音素数が少ない順
+    
+    # シード固定でランダム性を加える（同点の場合の順序をランダム化）
+    # ただし、音素数が少ない文を優先
+    selected = []
+    covered_phonemes = set()
+    target_max_coverage = 25  # 目標: 25音素以下
+    
     random.seed(seed)
-    selected = random.sample(all_sentence_ids, 4)
+    for sentence_id, phoneme_count in sentence_scores:
+        if len(selected) >= 4:
+            break
+        
+        stats = sentence_stats[sentence_id]
+        sentence_phonemes = set(stats['unique_phonemes'])
+        new_phonemes = sentence_phonemes - covered_phonemes
+        new_coverage_count = len(covered_phonemes | sentence_phonemes)
+        
+        # 目標カバレッジを超えないように制御
+        if new_coverage_count <= target_max_coverage:
+            selected.append(sentence_id)
+            covered_phonemes.update(sentence_phonemes)
+        elif len(selected) == 0:
+            # 最初の文は必ず追加（最小音素数の文）
+            selected.append(sentence_id)
+            covered_phonemes.update(sentence_phonemes)
+    
+    # 4文に満たない場合は、目標カバレッジを超えても追加
+    if len(selected) < 4:
+        for sentence_id, phoneme_count in sentence_scores:
+            if sentence_id in selected:
+                continue
+            if len(selected) >= 4:
+                break
+            selected.append(sentence_id)
+            stats = sentence_stats[sentence_id]
+            covered_phonemes.update(stats['unique_phonemes'])
+    
     return sorted(selected)
 
 
