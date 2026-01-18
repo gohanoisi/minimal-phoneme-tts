@@ -31,6 +31,7 @@
 - [要件定義書](docs/requirements.md) - プロジェクトの要件定義と機能仕様
 - [設計レベルメモ](docs/design_memo.md) - タスク分解と実験設計
 - [PDCAチェックリスト](docs/pdca_checklist.md) - 日次進捗管理
+- [開発ログ](docs/development_log.md) - 開発プロセスの詳細ログ（論文作成用）
 - [要求定義書（元版）](docs/original_requirements.md) - 初期の要求定義
 
 ## 環境要件
@@ -43,12 +44,49 @@
 
 ## セットアップ
 
+### 1. 仮想環境の有効化
+
 ```bash
 # 仮想環境の有効化（既存のvenvを使用）
 source /home/gohan/.venv/bin/activate
+```
 
+### 2. 依存パッケージのインストール
+
+```bash
 # 依存パッケージのインストール
 pip install -r requirements.txt
+
+# ESPnet2のインストール（時間がかかる場合があります）
+pip install espnet[all]
+```
+
+### 3. JVS parallel100データの準備
+
+1. [JVS parallel100](https://sites.google.com/site/shinnosuketakamichi/research-topics/jvs_corpus)からデータをダウンロード
+2. `jvs002`話者のデータを`data/jvs002/`に配置
+3. 期待されるディレクトリ構造:
+   ```
+   data/jvs002/
+   ├── parallel100/
+   │   ├── wav24kHz16bit/
+   │   │   ├── jvs002_001.wav
+   │   │   ├── jvs002_002.wav
+   │   │   └── ...
+   │   └── transcripts_utf8.txt
+   ```
+
+### 4. データ前処理の実行
+
+```bash
+# 音素分析の実行
+python src/phoneme_analysis.py
+
+# コーパス選定の実行
+python src/corpus_selection.py
+
+# データ前処理の実行
+python src/preprocess.py
 ```
 
 ## プロジェクト構造

@@ -48,13 +48,13 @@ ESPnet2/StyleTTS2の選定と環境構築を完了し、JVS parallel100データ
 - **追加必要**: ESPnet2/StyleTTS2, pyopenjtalk, librosa, soundfile等のTTS関連パッケージ
 
 #### タスク
-- [ ] ESPnet2とStyleTTS2の比較調査（公式ドキュメント、日本語対応状況、評価スクリプトの有無）
-- [ ] TTS基盤の選定決定（ESPnet2優先、失敗時はStyleTTS2）
-- [ ] 既存venv環境の確認と有効化（`/home/gohan/.venv`）
-- [ ] PyTorch動作確認（CUDA認識、GPU利用確認）
-- [ ] requirements.txtの作成（TTS関連パッケージのみ記載）
+- [x] ESPnet2とStyleTTS2の比較調査（公式ドキュメント、日本語対応状況、評価スクリプトの有無）
+- [x] TTS基盤の選定決定（ESPnet2優先、失敗時はStyleTTS2）
+- [x] 既存venv環境の確認と有効化（`/home/gohan/.venv`）
+- [x] PyTorch動作確認（CUDA認識、GPU利用確認）
+- [x] requirements.txtの作成（TTS関連パッケージのみ記載）
 - [ ] ESPnet2のインストール（またはStyleTTS2）
-- [ ] 依存ライブラリのインストール（pyopenjtalk, librosa, soundfile, matplotlib, seaborn等）
+- [x] 依存ライブラリのインストール（pyopenjtalk, librosa, soundfile, matplotlib, seaborn等）
 - [ ] JVS parallel100データのダウンロード・配置確認
 - [ ] jvs002話者の100文データの存在確認（音声ファイル、テキストファイル）
 - [ ] 簡単な動作テスト（ESPnet2のサンプル実行またはStyleTTS2のデモ実行）
@@ -80,19 +80,19 @@ ESPnet2/StyleTTS2の選定と環境構築を完了し、JVS parallel100データ
 - **出力形式**: JSON/CSVで音素分布と文IDリストを保存
 
 #### タスク
-- [ ] `src/phoneme_analysis.py`の作成（音素ラベル抽出スクリプト）
-- [ ] pyopenjtalkを使用した100文の音素列抽出
-- [ ] 37音素インベントリの確認・リスト化
-- [ ] 各文の音素分布（ユニーク音素数、頻度）を計算
-- [ ] 音素分布データをJSON/CSV形式で保存（`results/phoneme_distribution.json`）
-- [ ] `src/corpus_selection.py`の作成（コーパス選定スクリプト）
-- [ ] 80文コーパスの選定（8:2分割、ランダムシード固定）
-- [ ] 37音素カバー4文の選定（貪欲法、既存結果の再現または新規計算）
-- [ ] ランダム4文の選定（シード固定、含有音素数を計測）
-- [ ] 上位10文の選定（音素特徴量スコアリング: ユニーク音素数 + レア音素数）
-- [ ] 4条件の文IDリストをJSON形式で保存（`results/corpus_selection.json`）
-- [ ] 各条件の音素カバレッジを確認・記録
-- [ ] テストセットの確定（4条件すべてで未学習となる10-20文）
+- [x] `src/phoneme_analysis.py`の作成（音素ラベル抽出スクリプト）
+- [ ] pyopenjtalkを使用した100文の音素列抽出（JVSデータ準備後に実行）
+- [ ] 37音素インベントリの確認・リスト化（JVSデータ準備後に実行）
+- [ ] 各文の音素分布（ユニーク音素数、頻度）を計算（JVSデータ準備後に実行）
+- [ ] 音素分布データをJSON/CSV形式で保存（`results/phoneme_distribution.json`）（JVSデータ準備後に実行）
+- [x] `src/corpus_selection.py`の作成（コーパス選定スクリプト）
+- [ ] 80文コーパスの選定（8:2分割、ランダムシード固定）（JVSデータ準備後に実行）
+- [ ] 37音素カバー4文の選定（貪欲法、既存結果の再現または新規計算）（JVSデータ準備後に実行）
+- [ ] ランダム4文の選定（シード固定、含有音素数を計測）（JVSデータ準備後に実行）
+- [ ] 上位10文の選定（音素特徴量スコアリング: ユニーク音素数 + レア音素数）（JVSデータ準備後に実行）
+- [ ] 4条件の文IDリストをJSON形式で保存（`results/corpus_selection.json`）（JVSデータ準備後に実行）
+- [ ] 各条件の音素カバレッジを確認・記録（JVSデータ準備後に実行）
+- [ ] テストセットの確定（4条件すべてで未学習となる10-20文）（JVSデータ準備後に実行）
 
 #### 完了条件
 - `results/phoneme_distribution.json`に100文の音素分布が保存されている

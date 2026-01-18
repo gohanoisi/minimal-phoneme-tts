@@ -65,14 +65,14 @@
 - ESPnet2/StyleTTS2の選定と環境構築
 
 **やるタスク**（設計レベルメモ Phase 1参照）
-- [ ] ESPnet2とStyleTTS2の比較調査（公式ドキュメント、日本語対応状況、評価スクリプトの有無）
-- [ ] TTS基盤の選定決定（ESPnet2優先、失敗時はStyleTTS2）
-- [ ] 既存venv環境の確認と有効化（`/home/gohan/.venv`、Python 3.12.9、PyTorch 2.5.1+cu121既存）
-- [ ] PyTorch動作確認（CUDA認識、GPU利用確認）※既にインストール済みのため確認のみ
-- [ ] requirements.txtの作成（TTS関連パッケージのみ記載）
-- [ ] ESPnet2のインストール（またはStyleTTS2）
-- [ ] 依存ライブラリのインストール（pyopenjtalk, librosa, soundfile, matplotlib, seaborn等）
-- [ ] JVS parallel100データのダウンロード・配置確認
+- [x] ESPnet2とStyleTTS2の比較調査（公式ドキュメント、日本語対応状況、評価スクリプトの有無）
+- [x] TTS基盤の選定決定（ESPnet2優先、失敗時はStyleTTS2）
+- [x] 既存venv環境の確認と有効化（`/home/gohan/.venv`、Python 3.12.9、PyTorch 2.5.1+cu121既存）
+- [x] PyTorch動作確認（CUDA認識、GPU利用確認）※既にインストール済みのため確認のみ
+- [x] requirements.txtの作成（TTS関連パッケージのみ記載）
+- [x] ESPnet2のインストール（またはStyleTTS2）
+- [x] 依存ライブラリのインストール（pyopenjtalk, librosa, soundfile, matplotlib, seaborn等）
+- [x] JVS parallel100データのダウンロード・配置確認
 
 **詰まりそうなポイント**
 - ESPnet2環境構築失敗（影響度：高）→ StyleTTS2へ早期切り替え
@@ -82,29 +82,41 @@
 
 実行ログ（時間＋内容）:
 ```
-[時刻] 
-[時刻] 
-[時刻] 
-[時刻] 
-[時刻] 
+[2026-01-18] プロジェクト構造の確認、ディレクトリ作成
+[2026-01-18] PyTorch動作確認（CUDA認識済み）
+[2026-01-18] 依存ライブラリのインストール完了（pyopenjtalk, librosa, soundfile等）
+[2026-01-18] src/phoneme_analysis.py作成完了
+[2026-01-18] src/corpus_selection.py作成完了
+[2026-01-18] src/preprocess.py作成完了
+[2026-01-18] ESPnet2のインストール完了（pip install -e "./espnet[tts]"）
+[2026-01-18] JVSデータの配置確認完了
+[2026-01-18] ESPnet2動作確認完了（TTSモジュールインポート成功）
 ```
 
 #### Check（確認）
 
 **できたこと / できなかったこと**
-- 
+- ✓ プロジェクト構造の作成（src/, scripts/, configs/, tests/, data/, results/, outputs/）
+- ✓ PyTorch動作確認（CUDA 12.1認識済み）
+- ✓ 依存ライブラリのインストール完了
+- ✓ Phase 2のスクリプト作成完了（phoneme_analysis.py, corpus_selection.py）
+- ✓ Phase 3のスクリプト作成完了（preprocess.py）
+- ✓ ESPnet2のインストール完了（TTS機能付き）
+- ✓ JVSデータの準備完了（ダウンロード・配置済み）
 
 
 **想定との差分**
-- 
+- スクリプト作成が順調に進んだため、Phase 2, 3のスクリプトを先に作成
+- ESPnet2のインストールは想定通り完了（既存venvに直接インストール）
+- JVSデータの準備はユーザーが事前に実施済み
 
 
 #### Action（改善）
 
 **次回変えること**
-1. 
-2. 
-3. 
+1. ✅ ESPnet2のインストール完了
+2. ✅ JVS parallel100データの準備完了
+3. 次のセッションで音素分析とコーパス選定を実行
 
 ---
 
@@ -118,15 +130,15 @@
 
 **やるタスク**（設計レベルメモ Phase 1, 2参照）
 - [ ] 簡単な動作テスト（ESPnet2のサンプル実行またはStyleTTS2のデモ実行）
-- [ ] requirements.txtの作成・更新
-- [ ] `src/phoneme_analysis.py`の作成（音素ラベル抽出スクリプト）
-- [ ] pyopenjtalkを使用した100文の音素列抽出
-- [ ] 37音素インベントリの確認・リスト化
-- [ ] 各文の音素分布（ユニーク音素数、頻度）を計算
-- [ ] 音素分布データをJSON/CSV形式で保存（`results/phoneme_distribution.json`）
-- [ ] `src/corpus_selection.py`の作成（コーパス選定スクリプト）
-- [ ] 4条件のコーパス選定（80文/37音素4文/ランダム4文/上位10文）
-- [ ] 4条件の文IDリストをJSON形式で保存（`results/corpus_selection.json`）
+- [x] requirements.txtの作成・更新
+- [x] `src/phoneme_analysis.py`の作成（音素ラベル抽出スクリプト）
+- [ ] pyopenjtalkを使用した100文の音素列抽出（JVSデータ準備後に実行）
+- [ ] 37音素インベントリの確認・リスト化（JVSデータ準備後に実行）
+- [ ] 各文の音素分布（ユニーク音素数、頻度）を計算（JVSデータ準備後に実行）
+- [ ] 音素分布データをJSON/CSV形式で保存（`results/phoneme_distribution.json`）（JVSデータ準備後に実行）
+- [x] `src/corpus_selection.py`の作成（コーパス選定スクリプト）
+- [ ] 4条件のコーパス選定（80文/37音素4文/ランダム4文/上位10文）（JVSデータ準備後に実行）
+- [ ] 4条件の文IDリストをJSON形式で保存（`results/corpus_selection.json`）（JVSデータ準備後に実行）
 
 **詰まりそうなポイント**
 - 37音素カバー4文が存在しない（影響度：中）→ 貪欲法を再実行、5文に拡張も検討
@@ -136,29 +148,35 @@
 
 実行ログ（時間＋内容）:
 ```
-[時刻] 
-[時刻] 
-[時刻] 
-[時刻] 
-[時刻] 
+[2026-01-18] phoneme_analysis.pyの修正（テキストファイル読み込み、音素抽出）
+[2026-01-18] 音素分析スクリプト実行完了（38音素インベントリ確認）
+[2026-01-18] コーパス選定スクリプト実行完了（4条件のコーパス選定完了）
+[2026-01-18] 結果ファイル保存完了（phoneme_distribution.json, corpus_selection.json）
 ```
 
 #### Check（確認）
 
 **できたこと / できなかったこと**
-- 
+- ✓ pyopenjtalkを使用した100文の音素列抽出完了
+- ✓ 38音素インベントリの確認・リスト化完了（pau含む）
+- ✓ 各文の音素分布（ユニーク音素数、頻度）を計算完了
+- ✓ 音素分布データをJSON/CSV形式で保存完了
+- ✓ 4条件のコーパス選定完了（80文/37音素4文/ランダム4文/上位10文）
+- ✓ 4条件の文IDリストをJSON形式で保存完了
+- ✓ テストセットの選定完了（18文）
 
 
 **想定との差分**
-- 
+- 音素インベントリが37音素ではなく38音素（pau含む）となった。これはpyopenjtalkの出力形式によるもので、問題なし
+- E2（37音素4文）が実際には38音素をカバーしていることを確認。名称は「37音素4文」のまま維持（pauはポーズ音素として重要だが、実験設計上は37音素を想定）
 
 
 #### Action（改善）
 
 **次回変えること**
-1. 
-2. 
-3. 
+1. ✅ Phase 2完了、Phase 3（データ前処理）に進む
+2. Phase 3でESPnet2形式のデータリスト生成を実行
+3. Phase 4のfine-tuning準備を開始
 
 ---
 
@@ -190,29 +208,37 @@
 
 実行ログ（時間＋内容）:
 ```
-[時刻] 
-[時刻] 
-[時刻] 
-[時刻] 
-[時刻] 
+[2026-01-18] preprocess.pyの修正（テキスト読み込み、音素抽出）
+[2026-01-18] データ前処理スクリプト実行完了（4条件すべてのデータリスト生成）
+[2026-01-18] ESPnet2のfine-tuning方法の調査（JVSレシピ、tts_train.py確認）
+[2026-01-18] Phase 4のPlan作成（docs/phase4_plan.md）
 ```
 
 #### Check（確認）
 
 **できたこと / できなかったこと**
-- 
+- ✓ JVSデータの読み込み完了（音声ファイル、テキストファイルのパス取得）
+- ✓ 音声ファイルの確認完了（24kHz、モノラル、正常に読み込み可能）
+- ✓ テキストから音素列への変換完了（pyopenjtalk使用、kana=False）
+- ✓ ESPnet2形式のdata.list生成完了（4条件すべて）
+- ✓ テストセットのデータリスト生成完了
+- ✓ ESPnet2のfine-tuning方法の調査完了
+- ⚠️ ESPnet2形式（Kaldi形式）への変換が必要（次のステップ）
 
 
 **想定との差分**
-- 
+- データ形式がESPnet2のKaldi形式ではなく、独自のJSONL形式（data.list）で生成した
+- ESPnet2のfine-tuningにはKaldi形式（wav.scp, text, utt2spk等）が必要であることを確認
+- データ形式変換スクリプトの作成が必要
 
 
 #### Action（改善）
 
 **次回変えること**
-1. 
-2. 
-3. 
+1. ✅ Phase 3完了、Phase 4のPlan作成完了
+2. Phase 4でESPnet2形式へのデータ変換スクリプトを作成
+3. ESPnet2の設定ファイル（YAML）を作成
+4. 事前学習モデルのダウンロード
 
 ---
 
@@ -506,3 +532,6 @@
 | Date | Version | Changes |
 |------|---------|---------|
 | 2026-01-15 | 1.0 | 初版作成 |
+| 2026-01-18 | 1.1 | Phase 1-3のスクリプト作成完了、PDCAチェックリスト更新 |
+| 2026-01-18 | 1.2 | Phase 2完了（音素分析・コーパス選定実行完了）、Day 2のPDCA更新 |
+| 2026-01-18 | 1.3 | Phase 3完了（データ前処理実行完了）、Day 3のPDCA更新、Phase 4のPlan作成 |
