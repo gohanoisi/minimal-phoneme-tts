@@ -9,6 +9,7 @@ import os
 import random
 import subprocess
 import sys
+import tempfile
 import time
 from datetime import datetime
 from pathlib import Path
@@ -16,6 +17,7 @@ from typing import Dict, Optional, List
 import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
+import yaml
 
 
 def set_seed(seed: int = 42):
@@ -76,6 +78,9 @@ def run_espnet2_tts_train(
     config_file: Path,
     pretrained_model: Optional[str] = None,
     collect_stats: bool = False,
+    stats_file: Optional[str] = None,
+    train_shape_file: Optional[List[str]] = None,
+    valid_shape_file: Optional[List[str]] = None,
     seed: int = 42
 ) -> int:
     """
@@ -97,10 +102,38 @@ def run_espnet2_tts_train(
     # 出力ディレクトリの作成
     output_dir.mkdir(parents=True, exist_ok=True)
     
+    # 使用する設定ファイルのパス（stats_fileがある場合は一時的な設定ファイルを作成）
+    actual_config_file = config_file
+    temp_config_file = None
+    
+    # Fine-tuningモードでstats_fileやshape_fileが指定されている場合、設定ファイルを更新
+    if not collect_stats and (stats_file or train_shape_file or valid_shape_file):
+        # 設定ファイルを読み込む
+        with open(config_file, 'r', encoding='utf-8') as f:
+            config_dict = yaml.safe_load(f)
+        
+        # normalize_confにstats_fileを追加
+        if stats_file:
+            if 'normalize_conf' not in config_dict:
+                config_dict['normalize_conf'] = {}
+            config_dict['normalize_conf']['stats_file'] = str(stats_file)
+        
+        # train_shape_fileとvalid_shape_fileを追加
+        if train_shape_file:
+            config_dict['train_shape_file'] = train_shape_file
+        if valid_shape_file:
+            config_dict['valid_shape_file'] = valid_shape_file
+        
+        # 一時的な設定ファイルを作成
+        temp_config_file = tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False, encoding='utf-8')
+        yaml.dump(config_dict, temp_config_file, allow_unicode=True)
+        temp_config_file.close()
+        actual_config_file = Path(temp_config_file.name)
+    
     # ESPnet2のtts_trainコマンドを構築
     cmd = [
         sys.executable, "-m", "espnet2.bin.tts_train",
-        "--config", str(config_file),
+        "--config", str(actual_config_file),
         "--train_data_path_and_name_and_type", f"{train_data_dir}/wav.scp,speech,sound",
         "--train_data_path_and_name_and_type", f"{train_data_dir}/text,text,text",
         "--valid_data_path_and_name_and_type", f"{valid_data_dir}/wav.scp,speech,sound",
@@ -114,6 +147,9 @@ def run_espnet2_tts_train(
     if collect_stats:
         cmd.append("--collect_stats")
         cmd.append("true")
+        # 統計情報収集モードではnormalizeをnullにする（stats_fileがまだ存在しないため）
+        cmd.append("--normalize")
+        cmd.append("null")
         print(f"[Step 1] Collecting statistics for {condition_name}...")
     else:
         # Fine-tuningの場合、事前学習モデルを指定
@@ -130,10 +166,16 @@ def run_espnet2_tts_train(
     # コマンドを実行
     try:
         result = subprocess.run(cmd, check=False, capture_output=False)
-        return result.returncode
+        return_code = result.returncode
     except Exception as e:
         print(f"Error running ESPnet2 training: {e}")
-        return 1
+        return_code = 1
+    finally:
+        # 一時的な設定ファイルを削除
+        if temp_config_file and Path(temp_config_file.name).exists():
+            Path(temp_config_file.name).unlink()
+    
+    return return_code
 
 
 def train_condition(
@@ -206,6 +248,27 @@ def train_condition(
         print(f"Warning: Statistics collection failed for {condition_name} (exit code: {stats_code})")
         # 統計情報収集に失敗してもFine-tuningは続行する（ESPnet2が自動で統計情報を収集する可能性があるため）
     
+    # 統計情報ファイルとshapeファイルのパスを取得（統計情報収集が成功した場合）
+    stats_file_path = None
+    train_shape_files = None
+    valid_shape_files = None
+    if stats_code == 0:
+        stats_file_path = stats_output_dir / "train" / "feats_stats.npz"
+        if not stats_file_path.exists():
+            print(f"Warning: Statistics file not found: {stats_file_path}")
+            stats_file_path = None
+        
+        # shapeファイルのパスを取得
+        train_text_shape = stats_output_dir / "train" / "text_shape"
+        train_speech_shape = stats_output_dir / "train" / "speech_shape"
+        valid_text_shape = stats_output_dir / "valid" / "text_shape"
+        valid_speech_shape = stats_output_dir / "valid" / "speech_shape"
+        
+        if train_text_shape.exists() and train_speech_shape.exists():
+            train_shape_files = [str(train_text_shape), str(train_speech_shape)]
+        if valid_text_shape.exists() and valid_speech_shape.exists():
+            valid_shape_files = [str(valid_text_shape), str(valid_speech_shape)]
+    
     # Step 2: Fine-tuning
     ft_output_dir = output_dir / f"{condition_dir_name}"
     ft_start = time.time()
@@ -217,6 +280,9 @@ def train_condition(
         config_file=config_file,
         pretrained_model=pretrained_model,
         collect_stats=False,
+        stats_file=str(stats_file_path) if stats_file_path else None,
+        train_shape_file=train_shape_files,
+        valid_shape_file=valid_shape_files,
         seed=seed
     )
     ft_end = time.time()

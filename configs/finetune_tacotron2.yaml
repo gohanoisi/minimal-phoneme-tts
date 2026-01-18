@@ -56,6 +56,124 @@ optim_conf:           # keyword arguments for selected optimizer
 #   - 80 sentences: ~5000-10000 steps (adjust based on iterations)
 #   - 4-10 sentences: ~1000-3000 steps (adjust based on iterations)
 num_iters_per_epoch: 100    # number of iters per epoch
+
+##########################################################
+#                  TOKEN LIST SETTING                    #
+##########################################################
+# Token list for pyopenjtalk_accent_with_pause
+# This must match the pretrained model's token list
+token_list:
+  - <blank>
+  - <unk>
+  - '1'
+  - '2'
+  - '0'
+  - '3'
+  - '4'
+  - '-1'
+  - '5'
+  - a
+  - o
+  - '-2'
+  - i
+  - '-3'
+  - u
+  - e
+  - k
+  - n
+  - t
+  - '6'
+  - r
+  - '-4'
+  - s
+  - N
+  - m
+  - pau
+  - '7'
+  - sh
+  - d
+  - g
+  - w
+  - '8'
+  - U
+  - '-5'
+  - I
+  - cl
+  - h
+  - y
+  - b
+  - '9'
+  - j
+  - ts
+  - ch
+  - '-6'
+  - z
+  - p
+  - '-7'
+  - f
+  - ky
+  - ry
+  - '-8'
+  - gy
+  - '-9'
+  - hy
+  - ny
+  - '-10'
+  - by
+  - my
+  - '-11'
+  - '-12'
+  - '-13'
+  - py
+  - '-14'
+  - '-15'
+  - v
+  - '10'
+  - '-16'
+  - '-17'
+  - '11'
+  - '-21'
+  - '-20'
+  - '12'
+  - '-19'
+  - '13'
+  - '-18'
+  - '14'
+  - dy
+  - '15'
+  - ty
+  - '-22'
+  - '16'
+  - '18'
+  - '19'
+  - '17'
+  - <sos/eos>
+token_type: phn
+
+##########################################################
+#                PREPROCESSOR SETTING                    #
+##########################################################
+# Text preprocessing
+cleaner: jaconv
+g2p: pyopenjtalk_accent_with_pause
+
+# Feature extraction
+feats_extract: fbank
+feats_extract_conf:
+    fs: 24000
+    n_fft: 2048
+    win_length: 1200
+    hop_length: 300
+    n_mels: 80
+    fmin: 80
+    fmax: 7600
+
+# Normalization
+# Note: stats_file will be generated during collect_stats mode
+# For fine-tuning, use the stats_file from the stats collection step
+normalize: global_mvn
+normalize_conf: {}  # stats_file will be set automatically during collect_stats or fine-tuning
+
 max_epoch: 100              # number of epochs (will be limited by max_num_iter)
 grad_clip: 1.0              # gradient clipping norm
 grad_noise: false           # whether to use gradient noise injection

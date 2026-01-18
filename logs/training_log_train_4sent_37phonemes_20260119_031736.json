@@ -1,0 +1,11 @@
+{
+  "condition_name": "E2: 37音素4文",
+  "condition_dir_name": "train_4sent_37phonemes",
+  "start_time": "2026-01-19T03:17:36.395999",
+  "end_time": "2026-01-19T03:17:57.002731",
+  "total_time_seconds": 20.606732,
+  "stats_collection_success": true,
+  "fine_tuning_success": false,
+  "stats_collection_time_seconds": 10.404145240783691,
+  "fine_tuning_time_seconds": 10.20093584060669
+}

@@ -1,0 +1,291 @@
+config: /tmp/tmp913afr9t.yaml
+print_config: false
+log_level: INFO
+drop_last_iter: false
+dry_run: false
+iterator_type: sequence
+valid_iterator_type: null
+output_dir: /mnt/e/dev/minimal-phoneme-tts/exp/train_4sent_37phonemes
+ngpu: 1
+seed: 42
+num_workers: 1
+num_att_plot: 3
+dist_backend: nccl
+dist_init_method: env://
+dist_world_size: null
+dist_rank: null
+local_rank: null
+dist_master_addr: null
+dist_master_port: null
+dist_launcher: null
+multiprocessing_distributed: false
+unused_parameters: false
+sharded_ddp: false
+use_deepspeed: false
+deepspeed_config: null
+gradient_as_bucket_view: true
+ddp_comm_hook: null
+cudnn_enabled: true
+cudnn_benchmark: false
+cudnn_deterministic: true
+use_tf32: false
+collect_stats: false
+write_collected_feats: false
+max_epoch: 100
+patience: null
+val_scheduler_criterion:
+- valid
+- loss
+early_stopping_criterion:
+- valid
+- loss
+- min
+best_model_criterion:
+-   - valid
+    - loss
+    - min
+-   - train
+    - loss
+    - min
+keep_nbest_models: 5
+nbest_averaging_interval: 0
+grad_clip: 1.0
+grad_clip_type: 2.0
+grad_noise: false
+accum_grad: 1
+no_forward_run: false
+resume: false
+train_dtype: float32
+use_amp: false
+log_interval: null
+use_matplotlib: true
+use_tensorboard: true
+create_graph_in_tensorboard: false
+use_wandb: false
+wandb_project: null
+wandb_id: null
+wandb_entity: null
+wandb_name: null
+wandb_model_log_interval: -1
+detect_anomaly: false
+use_adapter: false
+adapter: lora
+save_strategy: all
+adapter_conf: {}
+pretrain_path: null
+init_param: []
+ignore_init_mismatch: false
+freeze_param: []
+num_iters_per_epoch: 100
+batch_size: 20
+valid_batch_size: null
+batch_bins: 3750000
+valid_batch_bins: null
+category_sample_size: 10
+upsampling_factor: 0.5
+category_upsampling_factor: 0.5
+dataset_upsampling_factor: 0.5
+dataset_scaling_factor: 1.2
+max_batch_size: null
+min_batch_size: 1
+train_shape_file:
+- /mnt/e/dev/minimal-phoneme-tts/exp/train_4sent_37phonemes/stats/train/text_shape
+- /mnt/e/dev/minimal-phoneme-tts/exp/train_4sent_37phonemes/stats/train/speech_shape
+valid_shape_file:
+- /mnt/e/dev/minimal-phoneme-tts/exp/train_4sent_37phonemes/stats/valid/text_shape
+- /mnt/e/dev/minimal-phoneme-tts/exp/train_4sent_37phonemes/stats/valid/speech_shape
+batch_type: numel
+valid_batch_type: null
+fold_length: []
+sort_in_batch: descending
+shuffle_within_batch: false
+sort_batch: descending
+multiple_iterator: false
+chunk_length: 500
+chunk_shift_ratio: 0.5
+num_cache_chunks: 1024
+chunk_excluded_key_prefixes: []
+chunk_default_fs: null
+chunk_max_abs_length: null
+chunk_discard_short_samples: true
+train_data_path_and_name_and_type:
+-   - /mnt/e/dev/minimal-phoneme-tts/data/train_4sent_37phonemes/wav.scp
+    - speech
+    - sound
+-   - /mnt/e/dev/minimal-phoneme-tts/data/train_4sent_37phonemes/text
+    - text
+    - text
+valid_data_path_and_name_and_type:
+-   - /mnt/e/dev/minimal-phoneme-tts/data/test/wav.scp
+    - speech
+    - sound
+-   - /mnt/e/dev/minimal-phoneme-tts/data/test/text
+    - text
+    - text
+multi_task_dataset: false
+allow_variable_data_keys: false
+max_cache_size: 0.0
+max_cache_fd: 32
+allow_multi_rates: false
+valid_max_cache_size: null
+exclude_weight_decay: false
+exclude_weight_decay_conf: {}
+optim: adam
+optim_conf:
+    eps: 1.0e-06
+    lr: 0.0001
+    weight_decay: 0.0
+scheduler: null
+scheduler_conf: {}
+token_list:
+- <blank>
+- <unk>
+- '1'
+- '2'
+- '0'
+- '3'
+- '4'
+- '-1'
+- '5'
+- a
+- o
+- '-2'
+- i
+- '-3'
+- u
+- e
+- k
+- n
+- t
+- '6'
+- r
+- '-4'
+- s
+- N
+- m
+- pau
+- '7'
+- sh
+- d
+- g
+- w
+- '8'
+- U
+- '-5'
+- I
+- cl
+- h
+- y
+- b
+- '9'
+- j
+- ts
+- ch
+- '-6'
+- z
+- p
+- '-7'
+- f
+- ky
+- ry
+- '-8'
+- gy
+- '-9'
+- hy
+- ny
+- '-10'
+- by
+- my
+- '-11'
+- '-12'
+- '-13'
+- py
+- '-14'
+- '-15'
+- v
+- '10'
+- '-16'
+- '-17'
+- '11'
+- '-21'
+- '-20'
+- '12'
+- '-19'
+- '13'
+- '-18'
+- '14'
+- dy
+- '15'
+- ty
+- '-22'
+- '16'
+- '18'
+- '19'
+- '17'
+- <sos/eos>
+odim: null
+model_conf: {}
+use_preprocessor: true
+token_type: phn
+bpemodel: null
+non_linguistic_symbols: null
+cleaner: jaconv
+g2p: pyopenjtalk_accent_with_pause
+feats_extract: fbank
+feats_extract_conf:
+    fmax: 7600
+    fmin: 80
+    fs: 24000
+    hop_length: 300
+    n_fft: 2048
+    n_mels: 80
+    win_length: 1200
+normalize: global_mvn
+normalize_conf:
+    stats_file: /mnt/e/dev/minimal-phoneme-tts/exp/train_4sent_37phonemes/stats/train/feats_stats.npz
+tts: tacotron2
+tts_conf:
+    aconv_chans: 32
+    aconv_filts: 15
+    adim: 512
+    atype: location
+    bce_pos_weight: 5.0
+    cumulate_att_w: true
+    dlayers: 2
+    dropout_rate: 0.5
+    dunits: 1024
+    econv_chans: 512
+    econv_filts: 5
+    econv_layers: 3
+    elayers: 1
+    embed_dim: 512
+    eunits: 512
+    guided_attn_loss_lambda: 1.0
+    guided_attn_loss_sigma: 0.4
+    output_activation: null
+    postnet_chans: 512
+    postnet_filts: 5
+    postnet_layers: 5
+    prenet_layers: 2
+    prenet_units: 256
+    reduction_factor: 1
+    spk_embed_dim: null
+    use_batch_norm: true
+    use_concate: true
+    use_guided_attn_loss: true
+    use_masking: true
+    use_residual: false
+    zoneout_rate: 0.1
+pitch_extract: null
+pitch_extract_conf: {}
+pitch_normalize: null
+pitch_normalize_conf: {}
+energy_extract: null
+energy_extract_conf: {}
+energy_normalize: null
+energy_normalize_conf: {}
+required:
+- output_dir
+- token_list
+version: '202511'
+distributed: false
