@@ -1,4 +1,4 @@
-config: /tmp/tmpu_foch6i.yaml
+config: /tmp/tmpjzes5ecn.yaml
 print_config: false
 log_level: INFO
 drop_last_iter: false
@@ -31,7 +31,7 @@ cudnn_deterministic: true
 use_tf32: false
 collect_stats: false
 write_collected_feats: false
-max_epoch: 100
+max_epoch: 10
 patience: null
 val_scheduler_criterion:
 - valid

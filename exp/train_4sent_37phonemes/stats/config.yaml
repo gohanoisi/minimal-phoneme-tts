@@ -31,7 +31,7 @@ cudnn_deterministic: true
 use_tf32: false
 collect_stats: true
 write_collected_feats: false
-max_epoch: 100
+max_epoch: 10
 patience: null
 val_scheduler_criterion:
 - valid

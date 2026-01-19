@@ -4,7 +4,7 @@
 # 使用方法: ./scripts/train_with_auto_resume.sh train_4sent_37phonemes
 
 CONDITION=$1
-MAX_EPOCH=100
+MAX_EPOCH=10
 CHECK_INTERVAL=60  # 60秒ごとにチェック
 
 if [ -z "$CONDITION" ]; then
