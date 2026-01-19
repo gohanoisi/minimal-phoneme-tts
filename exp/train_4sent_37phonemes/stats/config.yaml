@@ -79,7 +79,7 @@ freeze_param: []
 num_iters_per_epoch: 100
 batch_size: 20
 valid_batch_size: null
-batch_bins: 3750000
+batch_bins: 500000
 valid_batch_bins: null
 category_sample_size: 10
 upsampling_factor: 0.5

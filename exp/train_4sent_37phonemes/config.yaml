@@ -1,4 +1,4 @@
-config: /tmp/tmp913afr9t.yaml
+config: /tmp/tmpu_foch6i.yaml
 print_config: false
 log_level: INFO
 drop_last_iter: false
@@ -54,7 +54,7 @@ grad_clip_type: 2.0
 grad_noise: false
 accum_grad: 1
 no_forward_run: false
-resume: false
+resume: true
 train_dtype: float32
 use_amp: false
 log_interval: null
@@ -79,7 +79,7 @@ freeze_param: []
 num_iters_per_epoch: 100
 batch_size: 20
 valid_batch_size: null
-batch_bins: 3750000
+batch_bins: 500000
 valid_batch_bins: null
 category_sample_size: 10
 upsampling_factor: 0.5

@@ -55,6 +55,7 @@ optim_conf:           # keyword arguments for selected optimizer
 # For fine-tuning with small corpus:
 #   - 80 sentences: ~5000-10000 steps (adjust based on iterations)
 #   - 4-10 sentences: ~1000-3000 steps (adjust based on iterations)
+#   - Reduced to 10 epochs for time constraints (about 45 minutes for 4 sentences, allows testing 80-sentence corpus as well)
 num_iters_per_epoch: 100    # number of iters per epoch
 
 ##########################################################
@@ -174,14 +175,14 @@ feats_extract_conf:
 normalize: global_mvn
 normalize_conf: {}  # stats_file will be set automatically during collect_stats or fine-tuning
 
-max_epoch: 100              # number of epochs (will be limited by max_num_iter)
+max_epoch: 10               # number of epochs (reduced from 100 to 10 for time constraints and small corpus experiments, allows testing both 4-sentence and 80-sentence corpora)
 grad_clip: 1.0              # gradient clipping norm
 grad_noise: false           # whether to use gradient noise injection
 accum_grad: 1               # gradient accumulation
 # batch_bins: 1000000       # batch bins (for feats_type=fbank)
-batch_bins: 3750000         # batch bins (for feats_type=raw, *= n_shift / n_mels)
+# batch_bins: 3750000         # batch bins (for feats_type=raw, *= n_shift / n_mels)
 # For small corpus (4-10 sentences), reduce batch_bins to avoid OOM
-# batch_bins: 1000000       # uncomment for 4-10 sentence corpus
+batch_bins: 500000          # Reduced for small corpus (4 sentences) to avoid OOM
 batch_type: numel           # how to make batch
 sort_in_batch: descending   # how to sort data in making batch
 sort_batch: descending      # how to sort created batches

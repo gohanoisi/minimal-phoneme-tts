@@ -18,6 +18,10 @@
 - **E3**: 低カバレッジ4文（対照群、目標20-25音素、約50-65%カバー）
 - **E4**: 上位10文（音素特徴量上位）
 
+### 学習設定（変更履歴）
+- **max_epoch**: 100 → 20 → 10（時間制約のため変更、4文コーパス: 約45分、80文コーパスも実験可能）
+- **batch_bins**: 3750000 → 500000（小規模コーパス用に削減、GPU OOM回避）
+
 ### 全体スケジュール
 - **1/15-1/16 (2日)**: 環境構築・データ準備（Phase 1, 2）
 - **1/17-1/19 (3日)**: Fine-tuning実験（Phase 3, 4）
@@ -256,15 +260,18 @@
 - [x] ESPnet2形式へのデータ変換スクリプト作成（`src/convert_to_espnet2_format.py`）
 - [x] 4条件すべてとテストセットのESPnet2形式変換完了
 - [x] 設定ファイル作成（`configs/finetune_tacotron2.yaml`）
-- [ ] 学習スクリプトの実装（チェックポイント保存、ログ出力）
+- [x] 学習スクリプトの実装（チェックポイント保存、ログ出力、--resume対応）
 - [x] 乱数シード固定の実装（train.pyに既存）
-- [ ] バッチサイズの決定（GPU OOM回避のため小規模テスト実行）
+- [x] バッチサイズの決定（batch_bins: 3750000 → 500000に削減、GPU OOM回避成功）
 - [x] 学習率の設定確認（設定ファイルに記載済み）
-- [ ] `scripts/run_experiment_80sent.sh`の作成
-- [ ] `scripts/run_experiment_4sent_37phonemes.sh`の作成
+- [x] 設定ファイルの完成（token_list, normalize, feats_extract, g2p, cleaner追加）
+- [x] 学習進捗監視スクリプト作成（`scripts/check_progress.sh`, `scripts/monitor_training.sh`）
+- [x] 自動再開スクリプト作成（`scripts/train_with_auto_resume.sh`）
+- [x] E2（37音素4文）のfine-tuning小規模テスト実行
+- [x] max_epochを10に変更（時間制約のため、100から10に削減、80コーパスも実験可能）
 - [ ] E1（80文）のfine-tuning実行
-- [ ] E2（37音素4文）のfine-tuning実行
-- [ ] 各条件の学習ログ確認（損失の推移、収束状況）
+- [ ] E3（低カバレッジ4文）のfine-tuning実行
+- [ ] E4（上位10文）のfine-tuning実行
 
 **詰まりそうなポイント**
 - GPU OOM（影響度：中）→ バッチサイズ削減、mixed precision (fp16)使用、gradient accumulation
@@ -288,6 +295,23 @@
 [2026-01-19] 事前学習モデルのダウンロード実行（ESPnet model zooからkan-bayashi/jsut_tacotron2_accent_with_pauseをダウンロード、downloads/ディレクトリに保存）
 [2026-01-19] train.pyのデフォルトパスを実際のダウンロード後のパス構造に更新（動的検索機能も追加）
 [2026-01-19] .gitignoreでdownloads/が無視されることを確認（Gitコミットの心配なし）
+[2026-01-19] E2（train_4sent_37phonemes）でfine-tuningの小規模テスト実行開始
+[2026-01-19] 統計情報収集（Step 1）成功（exp/train_4sent_37phonemes/stats/に統計ファイル生成）
+[2026-01-19] 設定ファイルにtoken_list追加（事前学習モデルと同じ85トークン）
+[2026-01-19] 設定ファイルにnormalize, feats_extract, g2p, cleaner設定追加
+[2026-01-19] train.pyにstats_fileとshape_file自動設定機能追加
+[2026-01-19] 統計情報収集時のnormalize: null設定追加
+[2026-01-19] GPU OOM発生 → batch_binsを3750000から500000に削減（約1/7.5に削減）
+[2026-01-19] batch_bins削減後、GPU VRAM使用量が約11.5GB（93.6%）に安定、クラッシュ回避成功
+[2026-01-19] Epoch 1完了（Loss: train=4.323, valid=2.764、所要時間: 約4分39秒）
+[2026-01-19] Epoch 2完了（Loss: train=3.093, valid=2.523、所要時間: 約4分16秒）
+[2026-01-19] WSL環境のシンボリックリンク制限によるPermissionError発生（latest.pth作成時）
+[2026-01-19] 学習停止問題の調査・分析完了（docs/training_issue_analysis.md作成）
+[2026-01-19] train.pyに--resumeオプション自動追加機能実装（チェックポイント存在時）
+[2026-01-19] 学習進捗監視スクリプト作成（scripts/check_progress.sh, scripts/monitor_training.sh）
+[2026-01-19] 自動再開スクリプト作成（scripts/train_with_auto_resume.sh）
+[2026-01-19] max_epochを100から20に変更（時間制約と実験効率化のため）
+[2026-01-19] max_epochを20から10に変更（80コーパスも対照実験として実行するため、すべての条件で同じエポック数に統一）
 ```
 
 #### Check（確認）
@@ -297,10 +321,21 @@
 - ✓ Phase 3完了確認完了（データ検証、E3カバレッジ確認）
 - ✓ ESPnet2形式へのデータ変換スクリプト作成・実行完了
 - ✓ 4条件すべてとテストセットのKaldi形式ファイル生成完了（wav.scp, text, utt2spk, spk2utt）
-- ✓ fine-tuning設定ファイル作成完了
+- ✓ fine-tuning設定ファイル作成完了（token_list, normalize, feats_extract, g2p, cleaner設定追加）
 - ✓ train.pyの実装完了（ESPnet2のtts_train.py呼び出し、全条件ループ処理、統計情報収集とFine-tuningの2ステップ実行、学習時間記録機能を実装）
 - ✓ 事前学習モデルのダウンロード完了（downloads/0afe7c220cac7d9893eea4ff1e4ca64e/exp/tts_train_tacotron2_raw_phn_jaconv_pyopenjtalk_accent_with_pause/train.loss.ave_5best.pth、103MB）
 - ✓ train.pyのデフォルトパス更新完了（実際のダウンロード後のパス構造に対応、動的検索機能も追加）
+- ✓ GPU OOM対策完了（batch_bins: 3750000 → 500000に削減、クラッシュ回避成功）
+- ✓ E2（4文コーパス）でfine-tuning小規模テスト実行成功
+  - 統計情報収集（Step 1）成功
+  - Fine-tuning（Step 2）成功（Epoch 2まで完了）
+  - 1エポックあたり約4分30秒（100エポックで約7.5時間）
+  - Loss改善傾向確認（Epoch 1: 4.323 → Epoch 2: 3.093）
+- ✓ 学習進捗監視スクリプト作成完了
+- ✓ 自動再開スクリプト作成完了
+- ✓ 学習停止問題の調査・分析完了（WSLのシンボリックリンク制限が原因）
+- ✓ max_epochを10に変更（時間制約のため、80コーパスも実験可能）
+- ⚠️ WSL環境のシンボリックリンク制限により、各エポック完了時にPermissionError発生（学習自体は正常に動作、チェックポイントは保存される）
 
 
 **想定との差分**
@@ -308,14 +343,25 @@
 - Phase 4の実装を段階的に進める方針に変更（Step 1-2完了、Step 4の一部完了）
 - ESPnet2形式へのデータ変換が予想以上にスムーズに完了
 - 事前学習モデルのダウンロード後のパス構造が想定と異なる（ハッシュ値ディレクトリ`0afe7c220cac7d9893eea4ff1e4ca64e`）が、動的検索機能で対応
+- GPU OOM発生 → batch_binsを大幅に削減（3750000 → 500000）する必要が生じた
+- 設定ファイルにtoken_list, normalize, feats_extract等の設定を追加する必要が生じた（事前に想定していなかった）
+- WSL環境のシンボリックリンク制限により、学習停止問題が発生（自動再開スクリプトで対応）
+- 時間制約により、max_epochを100から10に削減（4文コーパス: 約45分、80文コーパスも実験可能、すべての条件で同じエポック数に統一）
 
 
 #### Action（改善）
 
 **次回変えること**
 1. ✅ 事前学習モデルのダウンロード完了
-2. ✅ train.pyの実装拡張完了（ESPnet2のtts_train.py呼び出し）
-3. E2（4文）で小規模テストを実行し、データ形式と学習プロセスの確認
+2. ✅ train.pyの実装拡張完了（ESPnet2のtts_train.py呼び出し、--resume対応）
+3. ✅ E2（4文）で小規模テスト実行完了（データ形式と学習プロセスの確認完了）
+4. ✅ GPU OOM対策完了（batch_bins削減）
+5. ✅ 設定ファイル完成（token_list, normalize等の設定追加）
+6. ✅ 学習進捗監視・自動再開機能追加
+7. E2（4文コーパス）の10エポック完了（現在2エポック完了、残り8エポック）
+8. E1（80文コーパス）のfine-tuning実行
+9. E3（低カバレッジ4文）のfine-tuning実行
+10. E4（上位10文）のfine-tuning実行
 
 ---
 
@@ -560,3 +606,5 @@
 | 2026-01-18 | 1.3 | Phase 3完了（データ前処理実行完了）、Day 3のPDCA更新、Phase 4のPlan作成 |
 | 2026-01-18 | 1.4 | E3コーパス選定方法変更、Phase 4実装開始（データ形式変換スクリプト作成・実行、設定ファイル作成）、Day 4のPDCA更新 |
 | 2026-01-19 | 1.5 | train.py実装完成、事前学習モデルダウンロード完了、パス設定更新、Day 4のPDCA更新（完了タスク追加） |
+| 2026-01-19 | 1.6 | E2 fine-tuningテスト実行、GPU OOM解決（batch_bins削減）、設定ファイル完成、学習進捗監視ツール作成、学習停止問題調査、max_epochを20に変更、Day 4のPDCA更新（実行ログ・成果追加） |
+| 2026-01-19 | 1.7 | max_epochを10に変更（80コーパスも対照実験として実行するため）、.gitignore更新（exp/とlogs/*.jsonを追加） |

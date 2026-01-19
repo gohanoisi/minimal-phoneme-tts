@@ -152,13 +152,21 @@ def run_espnet2_tts_train(
         cmd.append("null")
         print(f"[Step 1] Collecting statistics for {condition_name}...")
     else:
-        # Fine-tuningの場合、事前学習モデルを指定
-        if pretrained_model:
-            # 事前学習モデルのパス形式: model_path:model_name:model_name
-            # 例: ./downloads/kan-bayashi_jsut_tacotron2_accent_with_pause/.../train.loss.ave_5best.pth:tts:tts
-            cmd.append("--init_param")
-            cmd.append(f"{pretrained_model}:tts:tts")
-        print(f"[Step 2] Fine-tuning {condition_name}...")
+        # Fine-tuningの場合
+        # チェックポイントが存在する場合は--resumeを使用
+        checkpoint_file = output_dir / "checkpoint.pth"
+        if checkpoint_file.exists():
+            cmd.append("--resume")
+            cmd.append("true")
+            print(f"[Step 2] Resuming fine-tuning for {condition_name} from checkpoint...")
+        else:
+            # 事前学習モデルを指定（新規学習の場合）
+            if pretrained_model:
+                # 事前学習モデルのパス形式: model_path:model_name:model_name
+                # 例: ./downloads/kan-bayashi_jsut_tacotron2_accent_with_pause/.../train.loss.ave_5best.pth:tts:tts
+                cmd.append("--init_param")
+                cmd.append(f"{pretrained_model}:tts:tts")
+            print(f"[Step 2] Fine-tuning {condition_name}...")
     
     print(f"Command: {' '.join(cmd)}")
     print("-" * 60)
