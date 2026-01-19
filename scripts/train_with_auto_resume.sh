@@ -74,7 +74,17 @@ while [ "$CURRENT_EPOCH" -lt "$MAX_EPOCH" ]; do
 done
 
 ELAPSED=$(($(date +%s) - START_TIME))
+FINAL_EPOCH=$(get_current_epoch)
 echo ""
 echo "=== 学習終了 ==="
 echo "総所要時間: $((ELAPSED / 60))分"
-echo "最終エポック: $(get_current_epoch)"
+echo "最終エポック: ${FINAL_EPOCH}"
+
+# 最終エポックが目標に達しているか確認
+if [ "$FINAL_EPOCH" -ge "$MAX_EPOCH" ]; then
+    echo "✓ 学習正常完了: ${MAX_EPOCH}エポック達成"
+    exit 0
+else
+    echo "⚠ 警告: 目標エポック数に達していません（${FINAL_EPOCH}/${MAX_EPOCH}）"
+    exit 1
+fi

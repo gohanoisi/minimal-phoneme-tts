@@ -56,6 +56,8 @@ outputs/audio/
 outputs/figures/
 logs/*.md
 logs/*.json
+logs/*_run.log
+logs/nohup_*.log
 
 # Experiment results (checkpoints, tensorboard, stats, etc.)
 exp/
