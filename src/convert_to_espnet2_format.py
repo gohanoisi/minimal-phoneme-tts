@@ -50,7 +50,12 @@ def create_wav_scp(entries: List[Dict], output_path: Path) -> None:
 def create_text(entries: List[Dict], output_path: Path) -> None:
     """
     textファイルを作成
-    形式: <utt_id> <phoneme_sequence>
+    形式: <utt_id> <raw_text>
+    
+    NOTE:
+    - 事前学習済みTacotron2(JSUT)は raw text を入力として g2p/cleaner を適用する前提。
+    - ここでphoneme列を書いてしまうと、設定のg2pが再度適用され入力が崩れ、
+      fine-tuning後の合成が「一定音」になる等の失敗に繋がる可能性がある。
     
     Args:
         entries: データエントリのリスト
@@ -59,8 +64,8 @@ def create_text(entries: List[Dict], output_path: Path) -> None:
     with open(output_path, 'w', encoding='utf-8') as f:
         for entry in entries:
             utt_id = entry['utt_id']
-            phoneme = entry['phoneme']
-            f.write(f"{utt_id} {phoneme}\n")
+            text = entry['text']
+            f.write(f"{utt_id} {text}\n")
 
 
 def create_utt2spk(entries: List[Dict], output_path: Path) -> None:

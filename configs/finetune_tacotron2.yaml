@@ -175,7 +175,7 @@ feats_extract_conf:
 normalize: global_mvn
 normalize_conf: {}  # stats_file will be set automatically during collect_stats or fine-tuning
 
-max_epoch: 10               # number of epochs (reduced from 100 to 10 for time constraints and small corpus experiments, allows testing both 4-sentence and 80-sentence corpora)
+max_epoch: 12               # number of epochs (incremental extension to validate finetune quality; resume from checkpoint to run +2 epochs)
 grad_clip: 1.0              # gradient clipping norm
 grad_noise: false           # whether to use gradient noise injection
 accum_grad: 1               # gradient accumulation

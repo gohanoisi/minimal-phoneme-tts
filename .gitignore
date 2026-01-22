@@ -56,16 +56,21 @@ outputs/audio/
 outputs/figures/
 logs/*.md
 logs/*.json
+logs/*.log
 logs/*_run.log
 logs/nohup_*.log
 
 # Experiment results (checkpoints, tensorboard, stats, etc.)
 exp/
+exp_text/
 
 # ESPnet
 espnet_*/
 downloads/
 dump/
+
+# External libraries (git submodules or cloned repositories)
+ParallelWaveGAN/
 
 # OS
 .DS_Store

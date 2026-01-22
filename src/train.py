@@ -7,6 +7,7 @@ Fine-tuningスクリプト
 import json
 import os
 import random
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -182,6 +183,45 @@ def run_espnet2_tts_train(
         # 一時的な設定ファイルを削除
         if temp_config_file and Path(temp_config_file.name).exists():
             Path(temp_config_file.name).unlink()
+        
+        # WSL環境でのsymlinkエラー対応: latest.pthのフォールバック処理
+        if not collect_stats:  # Fine-tuningモードの場合のみ
+            try:
+                latest_path = output_dir / "latest.pth"
+                # 最新のチェックポイントファイルを探す
+                checkpoint_files = list(output_dir.glob("*.pth"))
+                if checkpoint_files:
+                    # ファイル名からエポック番号を抽出して最新を取得
+                    def get_epoch_num(path: Path) -> int:
+                        name = path.stem
+                        if name == "checkpoint":
+                            return 0
+                        if name.endswith("epoch"):
+                            try:
+                                return int(name.replace("epoch", ""))
+                            except ValueError:
+                                return 0
+                        return 0
+                    
+                    checkpoint_files.sort(key=get_epoch_num, reverse=True)
+                    latest_checkpoint = checkpoint_files[0]
+                    
+                    # latest.pthが存在しない、またはsymlinkでない場合
+                    if not latest_path.exists() or not latest_path.is_symlink():
+                        try:
+                            # 既存のlatest.pthを削除（通常ファイルの場合）
+                            if latest_path.exists():
+                                latest_path.unlink()
+                            # symlinkを作成
+                            latest_path.symlink_to(latest_checkpoint.name)
+                        except (OSError, PermissionError) as e:
+                            # WSL環境ではsymlinkが制限されるため、copyで代替
+                            print(f"Warning: Failed to create symlink for latest.pth: {e}")
+                            print(f"  Using copy instead: {latest_checkpoint.name} -> latest.pth")
+                            shutil.copy2(latest_checkpoint, latest_path)
+            except Exception as e:
+                # エラーが発生しても学習自体は続行
+                print(f"Warning: Failed to create latest.pth fallback: {e}")
     
     return return_code
 
