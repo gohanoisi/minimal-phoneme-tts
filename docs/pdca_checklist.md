@@ -683,6 +683,18 @@
 [2026-01-22] docs/results.mdを作成（実験結果レポート）
 [2026-01-22] docs/development_log.mdにセッション10を追加
 [2026-01-22] docs/pdca_checklist.mdとdocs/development_plan.mdを更新
+[2026-01-22 夜間] プレゼン資料作成スクリプト（src/create_presentation.py）を作成
+[2026-01-22 夜間] python-pptxライブラリをインストール
+[2026-01-22 夜間] PowerPoint形式のプレゼン資料を生成完了（11スライド、outputs/presentation/slides.pptx）
+[2026-01-23] 最終発表資料作成スクリプトを拡張（src/create_presentation.pyに最終発表用関数を追加）
+[2026-01-23] 最終発表資料を生成完了（16スライド、outputs/presentation/slides_final.pptx）
+  - 発表者情報・授業名を含むタイトルスライド
+  - 従来手法の課題を説明する背景スライド
+  - 音素解析結果、全音素カバーコーパス、Fine-tuning時間比較スライド
+  - 音声合成結果スライド（主観評価用）
+  - 考察・今後の課題スライド
+[2026-01-23] docs/development_log.mdにセッション11を追加
+[2026-01-23] docs/development_plan.mdとdocs/pdca_checklist.mdを更新
 ```
 
 #### Check（確認）
@@ -694,6 +706,8 @@
 - ✓ 結果レポート（results.md）の作成完了
 - ✓ 開発ログ（development_log.md）にセッション10を追加完了
 - ✓ PDCAチェックリストとdevelopment_planの更新完了
+- ✓ プレゼン資料作成完了（PowerPoint形式、11スライド、python-pptx使用）
+- ✓ 最終発表資料作成完了（PowerPoint形式、16スライド、発表者情報・音声埋め込み用スライド含む）
 - ⚠️ README.mdの最終更新は未完了（次のステップ）
 
 **想定との差分**
@@ -712,8 +726,11 @@
 
 **次回変えること**
 1. ✅ log-F0 RMSE修正完了、Phase 7完了、結果レポート作成完了
-2. README.mdの最終更新（使用方法、実験結果の概要、リポジトリ構造の説明）
-3. 最終確認（すべてのスクリプトが実行可能か、ドキュメントに不足がないか、結果ファイルが揃っているか）
+2. ✅ プレゼン資料作成完了（PowerPoint形式、11スライド）
+3. ✅ 最終発表資料作成完了（PowerPoint形式、16スライド、発表者情報・音声埋め込み用スライド含む）
+4. ✅ ドキュメント更新完了（development_log.md、pdca_checklist.md、development_plan.md）
+5. README.mdの最終更新（使用方法、実験結果の概要、リポジトリ構造の説明）
+6. 最終確認（すべてのスクリプトが実行可能か、ドキュメントに不足がないか、結果ファイルが揃っているか）
 
 ---
 

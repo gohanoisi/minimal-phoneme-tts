@@ -114,12 +114,46 @@
    - `docs/development_log.md`にセッション10を追加
    - `docs/pdca_checklist.md`と`docs/development_plan.md`を更新
 
+### 完了した作業（2026-01-22 夜間更新）
+
+1. **プレゼン資料作成完了**
+   - `src/create_presentation.py`を作成（PowerPoint生成スクリプト）
+   - `python-pptx`ライブラリをrequirements.txtに追加・インストール
+   - PowerPoint形式のプレゼン資料を生成完了（11スライド）
+   - 出力ファイル: `outputs/presentation/slides.pptx`
+   - スライド構成: タイトル、背景・目的、実験設計、評価指標、結果（MCD、log-F0 RMSE、可視化）、考察（2枚）、結論、今後の課題
+
+2. **最終発表資料作成完了（2026-01-23 更新）**
+   - `src/create_presentation.py`を拡張して最終発表資料用の関数を追加
+   - 最終発表資料を生成完了（16スライド）
+   - 出力ファイル: `outputs/presentation/slides_final.pptx`
+   - スライド構成:
+     - タイトル（発表者情報・授業名含む）
+     - 目次
+     - 背景（従来手法の課題）
+     - 目的
+     - 方法
+     - 結果（音素解析、全音素カバーコーパス、Fine-tuning時間比較、評価指標、MCD、log-F0 RMSE、可視化、音声合成）
+     - 考察（2枚）
+     - 今後の課題
+   - 音声ファイルの埋め込み用スライドを含む（手動で埋め込みが必要）
+
+### 完了した作業（2026-01-23 更新）
+
+1. **最終発表資料作成完了**
+   - `src/create_presentation.py`を拡張して最終発表資料用の関数を追加
+   - 最終発表資料を生成完了（16スライド）
+   - 出力ファイル: `outputs/presentation/slides_final.pptx`
+   - 発表者情報、従来手法の課題、音素解析結果、Fine-tuning時間比較、音声合成スライドを含む
+   - ドキュメント（development_log.md、pdca_checklist.md、development_plan.md）を更新
+
 ### 次の実施計画
 
 1. **README.mdの最終更新**
    - 使用方法の記載
    - 実験結果の概要
    - リポジトリ構造の説明
+   - プレゼン資料の生成方法
 
 2. **最終確認**
    - すべてのスクリプトが実行可能か
