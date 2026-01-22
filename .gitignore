@@ -71,6 +71,7 @@ dump/
 
 # External libraries (git submodules or cloned repositories)
 ParallelWaveGAN/
+espnet/
 
 # OS
 .DS_Store
